@@ -227,8 +227,13 @@ def parse_eval_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--timezone",
-        default="Asia/Singapore",
+        default="Asia/Shanghai",
         help="Timezone for datetime string, e.g. Asia/Singapore, America/New_York, America/Los_Angeles. You can check the full list via `import pytz; print(pytz.common_timezones)`",
+    )
+    parser.add_argument(
+        "--datetime_str",
+        default=None,
+        help="according https://github.com/EvolvingLMMs-Lab/lmms-eval/issues/234",
     )
     parser.add_argument(
         "--hf_hub_log_args",
@@ -283,7 +288,10 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
 
     if args.wandb_args:
         if "name" not in args.wandb_args:
-            name = f"{args.model}_{args.model_args}_{utils.get_datetime_str(timezone=args.timezone)}"
+            if args.datetime_str is None:
+                name = f"{args.model}_{args.model_args}_{utils.get_datetime_str(timezone=args.timezone)}"
+            else:
+                name = f"{args.model}_{args.model_args}_{args.datetime_str}"
             name = utils.sanitize_long_string(name)
             args.wandb_args += f",name={name}"
         wandb_logger = WandbLogger(**simple_parse_args_string(args.wandb_args))
@@ -465,7 +473,10 @@ def cli_evaluate_single(args: Union[argparse.Namespace, None] = None) -> None:
 
     eval_logger.info(f"Selected Tasks: {task_names}")
     request_caching_args = request_caching_arg_to_dict(cache_requests=args.cache_requests)
-    datetime_str = utils.get_datetime_str(timezone=args.timezone)
+    if args.datetime_str is None:
+        datetime_str = utils.get_datetime_str(timezone=args.timezone)
+    else:
+        datetime_str = args.datetime_str
 
     results = evaluator.simple_evaluate(
         model=args.model,

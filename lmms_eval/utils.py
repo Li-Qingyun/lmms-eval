@@ -595,7 +595,8 @@ def get_datetime_str(timezone="Asia/Singapore"):
     utc_now = datetime.datetime.now(datetime.timezone.utc)
     local_time = utc_now.astimezone(tz)
     return local_time.strftime("%Y%m%d_%H%M%S")
-    return local_time.strftime("%Y%m%d_%H%M%S")
+    # return datetime.datetime.now(datetime.timezone.utc).astimezone(pytz.timezone(timezone)).strftime("%Y%m%d_%H%M%S")
+    # return local_time.strftime("%Y%m%d_%H%M%S")
 
 
 def sanitize_long_string(s, max_length=40):
